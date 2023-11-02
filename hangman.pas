@@ -1,23 +1,25 @@
 var 
   MyForm, MYSecondForm:TCLForm;
-  startBtn : TclProButton;
-  titlekImg,manImg: TClProImage; 
-  chooseLbl,missingLetterLbl  : TClProLabel;
-  chooseCombo : TClComboBox;
-  loopCombo ,loop, source,counter : Integer;
-  gamePanel,letterPanel,missingletterPanel,screenPanel,gameContentPnl,imageHintContentPnl,hintContentPnl : TclProPanel;
-  strvalue, MyWord, WordMean,letter:String;
+  baslaBtn : TclProButton;
+  baslikImg,adamImg: TClProImage; 
+  secimLbl,cikmayanHarfLbl  : TClProLabel;
+  secimCombo : TClComboBox;
+  donguCombo ,dongu, source,counter : Integer;
+  oyunPanel,harfPanel,cikmayanHarfPanel,ekranPanel,gameContentPnl,imageHintContentPnl,hintContentPnl : TclProPanel;
+  strdeger, MyWord, WordMean,karakter:String;
   MyWordMean:TclMemo;
   LblDisplay,ztStartLbl:TclLabel;
   myGameEngine:TclGameEngine;
   MyPanel:TclPanel;
-  letterEdit,MyEdit:TclEdit;
+  harfEdit,MyEdit:TclEdit;
   EditFixWidth:Single;
   ztHintBtn,ztStartBtn:TclImage;
   ztLayout,ztHintBtnLayout:TclLayout;
-  AnswStr,word:String;
+  AnswStr,Kelime:String;
   wrongCount:integer;
+  
 
+{ --------------------- Yeni Kelime Alma Prosedürü --------------------- }
   Procedure GetNewWord(wordLength:Integer);
   begin
     myGameEngine:= TclGameEngine.Create;
@@ -32,30 +34,31 @@ var
     End;
   End;
   
-  
-  Procedure wordControl;
+   {--------------- kelime kontrol --------------------}
+  Procedure kelimeKontrol;
   var
     j:integer;
   begin
-    for j := 1 to StrToInt(chooseCombo.ItemIndex)+1 do
+    for j := 1 to StrToInt(secimCombo.ItemIndex)+1 do
     begin
-      if letterEdit.Text = '' Then
+      if harfEdit.Text = '' Then
       begin
         exit;
       end
       else
-        word := word+TClEdit(MYSecondForm.clFindComponent('MyEdit'+IntToStr(j))).Text;
+        kelime := kelime+TClEdit(MYSecondForm.clFindComponent('MyEdit'+IntToStr(j))).Text;
     end;
   
   End;
   
   
-
+  {---------------------kelime bilinip bilinmediğini kontrol------------------------------}
   Procedure CheckGameOnClick;
   begin
-    word := '';
-    wordControl;
-    AnswStr := word;
+    kelime := '';
+    kelimeKontrol;
+    //AnswStr :=Clomosy.GlobalVariableString;
+    AnswStr := kelime;
     AnswStr := AnsiUpperCase(AnswStr);
     If AnswStr=MyWord Then
     begin
@@ -63,7 +66,7 @@ var
       ztStartBtn.Tag := 0;
       MYSecondForm.setImage(ztStartBtn,'https://clomosy.com/educa/circled-play.png');
       ztStartLbl.Text := 'Start Game';
-      missingLetterLbl.Text :='';
+      cikmayanHarfLbl.Text :='';
       TclProButton(MYSecondForm.clFindComponent('BtnGoBack')).Click;
     end;
     else
@@ -78,12 +81,14 @@ var
     case ztStartBtn.Tag of
       0:
       begin
-        ztStartBtn.Tag := 1; 
+        //MYSecondForm.setImage(ztStartBtn,'https://img.icons8.com/carbon-copy/100/null/checked--v1.png');
+        //ztStartLbl.Text := 'Check Word';
+        ztStartBtn.Tag := 1; //buton içerisinde veri saklama işlemi yapılabilir. 
         wrongCount := 0;
-        GetNewWord(StrToInt(chooseCombo.ItemIndex)+1);
+        GetNewWord(StrToInt(secimCombo.ItemIndex)+1);
         MyWordMean.Text := WordMean;
-        letterEdit.Text:='';
-        letterEdit.SetFocus;
+        harfEdit.Text:='';
+        harfEdit.SetFocus;
         LblDisplay.Visible := False;
         ztStartBtn.Visible := False;
         ztStartLbl.Visible := False;
@@ -96,20 +101,20 @@ var
   End;
   
   
-  Procedure MyEditOnChange;
+  Procedure MyEditOnChange;//********************
   var
   harfState:Boolean;
   begin
     harfState:=False;
     source := MyWord;
 
-    for loop := 1 to chooseCombo.ItemIndex+1 do
+    for dongu := 1 to secimCombo.ItemIndex+1 do
     begin
-      letter := Copy(source, loop, 1);
-      if letterEdit.Text = letter then
+      karakter := Copy(source, dongu, 1);
+      if AnsiUpperCase(harfEdit.Text) = karakter then
       begin
         harfState:=True;
-        TClEdit(MYSecondForm.clFindComponent('MyEdit'+IntToStr(loop))).Text := letterEdit.Text;
+        TClEdit(MYSecondForm.clFindComponent('MyEdit'+IntToStr(dongu))).Text := harfEdit.Text;
         CheckGameOnClick;
       end;
     end;
@@ -117,44 +122,45 @@ var
     if not harfState then
     begin
       wrongCount := wrongCount +1;
-      missingLetterLbl.Text:=missingLetterLbl.Text+ letterEdit.Text + ' , ';
+      cikmayanHarfLbl.Text:=cikmayanHarfLbl.Text+ harfEdit.Text + ' , ';
       if wrongCount = 11 then
       begin
-        ShowMessage('word: '+'"'+ MyWord+'"' +' You Failed .');
+        ShowMessage('Kelime: '+'"'+ MyWord+'"' +' Başarısız oldun .');
         MYSecondForm.setImage(ztStartBtn,'https://clomosy.com/educa/checked2.png');
         ztStartLbl.Text := 'Check Word';
         ztStartBtn.Tag := 1;
         wrongCount := 1;
-        GetNewWord(StrToInt(chooseCombo.ItemIndex));
+        GetNewWord(StrToInt(secimCombo.ItemIndex));
         MyWordMean.Text := WordMean;
         MyEdit.Text:='';
         
         MyEdit.SetFocus;
         LblDisplay.Visible := False;
-        missingLetterLbl.Text:='';
+        cikmayanHarfLbl.Text:='';
       
-        clComponent.SetupComponent(manImg,'{"Align" : "Center","MarginLeft":5,"MarginRight":5,"MarginTop":50,"Width" :150, "Height":250,
+        clComponent.SetupComponent(adamImg,'{"Align" : "Center","MarginLeft":5,"MarginRight":5,"MarginTop":50,"Width" :150, "Height":250,
         "RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":0,
         "ImgUrl":"https://clomosy.com/educa/hangerTitle2.png", "ImgFit":"yes"}');
         TclProButton(MYSecondForm.clFindComponent('BtnGoBack')).Click;
       end;
       case wrongCount of
-      1:clComponent.SetupComponent(manImg,'{"Align" : "Center","MarginLeft":5,"MarginRight":5,"MarginTop":50,"Width" :150, "Height":250,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":0,"ImgUrl":"https://clomosy.com/educa/hangman1.png", "ImgFit":"yes"}');
-      2:clComponent.SetupComponent(manImg,'{"Align" : "Center","MarginLeft":5,"MarginRight":5,"MarginTop":50,"Width" :150, "Height":250,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":0,"ImgUrl":"https://clomosy.com/educa/hangman2.png", "ImgFit":"yes"}');
-      3:clComponent.SetupComponent(manImg,'{"Align" : "Center","MarginLeft":5,"MarginRight":5,"MarginTop":50,"Width" :150, "Height":250,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":0,"ImgUrl":"https://clomosy.com/educa/hangman3.png", "ImgFit":"yes"}');
-      4:clComponent.SetupComponent(manImg,'{"Align" : "Center","MarginLeft":5,"MarginRight":5,"MarginTop":50,"Width" :150, "Height":250,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":0,"ImgUrl":"https://clomosy.com/educa/hangman4.png", "ImgFit":"yes"}');
-      5:clComponent.SetupComponent(manImg,'{"Align" : "Center","MarginLeft":5,"MarginRight":5,"MarginTop":50,"Width" :150, "Height":250,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":0,"ImgUrl":"https://clomosy.com/educa/hangman5.png", "ImgFit":"yes"}');
-      6:clComponent.SetupComponent(manImg,'{"Align" : "Center","MarginLeft":5,"MarginRight":5,"MarginTop":50,"Width" :150, "Height":250,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":0,"ImgUrl":"https://clomosy.com/educa/hangman6.png", "ImgFit":"yes"}');
-      7:clComponent.SetupComponent(manImg,'{"Align" : "Center","MarginLeft":5,"MarginRight":5,"MarginTop":50,"Width" :150, "Height":250,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":0,"ImgUrl":"https://clomosy.com/educa/hangman7.png", "ImgFit":"yes"}');
-      8:clComponent.SetupComponent(manImg,'{"Align" : "Center","MarginLeft":5,"MarginRight":5,"MarginTop":50,"Width" :150, "Height":250,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":0,"ImgUrl":"https://clomosy.com/educa/hangman8.png", "ImgFit":"yes"}');
-      9:clComponent.SetupComponent(manImg,'{"Align" : "Center","MarginLeft":5,"MarginRight":5,"MarginTop":50,"Width" :150, "Height":250,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":0,"ImgUrl":"https://clomosy.com/educa/hangman9.png", "ImgFit":"yes"}');
-      10:clComponent.SetupComponent(manImg,'{"Align" : "Center","MarginLeft":5,"MarginRight":5,"MarginTop":50,"Width" :150, "Height":250,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":0,"ImgUrl":"https://clomosy.com/educa/hangman10.png", "ImgFit":"yes"}');
-      11:clComponent.SetupComponent(manImg,'{"Align" : "Center","MarginLeft":5,"MarginRight":5,"MarginTop":50,"Width" :150, "Height":250,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":0,"ImgUrl":"https://clomosy.com/educa/hangman11.png", "ImgFit":"yes"}');
+      1:clComponent.SetupComponent(adamImg,'{"Align" : "Center","MarginLeft":5,"MarginRight":5,"MarginTop":50,"Width" :150, "Height":250,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":0,"ImgUrl":"https://clomosy.com/educa/hangman1.png", "ImgFit":"yes"}');
+      2:clComponent.SetupComponent(adamImg,'{"Align" : "Center","MarginLeft":5,"MarginRight":5,"MarginTop":50,"Width" :150, "Height":250,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":0,"ImgUrl":"https://clomosy.com/educa/hangman2.png", "ImgFit":"yes"}');
+      3:clComponent.SetupComponent(adamImg,'{"Align" : "Center","MarginLeft":5,"MarginRight":5,"MarginTop":50,"Width" :150, "Height":250,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":0,"ImgUrl":"https://clomosy.com/educa/hangman3.png", "ImgFit":"yes"}');
+      4:clComponent.SetupComponent(adamImg,'{"Align" : "Center","MarginLeft":5,"MarginRight":5,"MarginTop":50,"Width" :150, "Height":250,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":0,"ImgUrl":"https://clomosy.com/educa/hangman4.png", "ImgFit":"yes"}');
+      5:clComponent.SetupComponent(adamImg,'{"Align" : "Center","MarginLeft":5,"MarginRight":5,"MarginTop":50,"Width" :150, "Height":250,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":0,"ImgUrl":"https://clomosy.com/educa/hangman5.png", "ImgFit":"yes"}');
+      6:clComponent.SetupComponent(adamImg,'{"Align" : "Center","MarginLeft":5,"MarginRight":5,"MarginTop":50,"Width" :150, "Height":250,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":0,"ImgUrl":"https://clomosy.com/educa/hangman6.png", "ImgFit":"yes"}');
+      7:clComponent.SetupComponent(adamImg,'{"Align" : "Center","MarginLeft":5,"MarginRight":5,"MarginTop":50,"Width" :150, "Height":250,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":0,"ImgUrl":"https://clomosy.com/educa/hangman7.png", "ImgFit":"yes"}');
+      8:clComponent.SetupComponent(adamImg,'{"Align" : "Center","MarginLeft":5,"MarginRight":5,"MarginTop":50,"Width" :150, "Height":250,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":0,"ImgUrl":"https://clomosy.com/educa/hangman8.png", "ImgFit":"yes"}');
+      9:clComponent.SetupComponent(adamImg,'{"Align" : "Center","MarginLeft":5,"MarginRight":5,"MarginTop":50,"Width" :150, "Height":250,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":0,"ImgUrl":"https://clomosy.com/educa/hangman9.png", "ImgFit":"yes"}');
+      10:clComponent.SetupComponent(adamImg,'{"Align" : "Center","MarginLeft":5,"MarginRight":5,"MarginTop":50,"Width" :150, "Height":250,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":0,"ImgUrl":"https://clomosy.com/educa/hangman10.png", "ImgFit":"yes"}');
+      11:clComponent.SetupComponent(adamImg,'{"Align" : "Center","MarginLeft":5,"MarginRight":5,"MarginTop":50,"Width" :150, "Height":250,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":0,"ImgUrl":"https://clomosy.com/educa/hangman11.png", "ImgFit":"yes"}');
       end;
     end;
  
   end;
   
+  {---------------KELİME UZUNLUĞU------------------}
   Procedure SetupLayout;
   begin
 
@@ -166,50 +172,52 @@ var
     MyPanel.Margins.Right:=20;
  
     
-    for counter:= 1 to chooseCombo.ItemIndex+1 do
+    for counter:= 1 to secimCombo.ItemIndex+1 do
     begin
       EditFixWidth := 25;
       MyEdit := MYSecondForm.AddNewEdit(MyPanel,'MyEdit'+IntToStr(counter),'_');
+      //MYSecondForm.AddNewEvent(MyEdit,tbeOnChange,'MyEditOnChange');
       MyEdit.Width := EditFixWidth;
       MyEdit.Align := alLeft;
       MyEdit.ReadOnly := True;
    
     end;
-    MyPanel.Width := EditFixWidth*(chooseCombo.ItemIndex+1);
+    MyPanel.Width := EditFixWidth*(secimCombo.ItemIndex+1);
   end;
 
 //HARFLER
 Procedure cikmayanHarf
 begin
 
-     missingletterPanel:=MYSecondForm.AddNewProPanel(gameContentPnl,'missingletterPanel');
-    clComponent.SetupComponent(missingletterPanel,'{"Align" : "MostTop","Width" :100, "MarginTop":5,
+     cikmayanHarfPanel:=MYSecondForm.AddNewProPanel(gameContentPnl,'cikmayanHarfPanel');
+    clComponent.SetupComponent(cikmayanHarfPanel,'{"Align" : "MostTop","Width" :100, "MarginTop":5,
     "Height":50,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":2}');
     
-     missingLetterLbl := MYSecondForm.AddNewProLabel(missingletterPanel,'missingLetterLbl','Harfler : ');
-   clComponent.SetupComponent(missingLetterLbl,'{"Align" : "left","MarginBottom":10,"MarginLeft":20,"Width" :250, "Height":30,"TextColor":"#000000","TextSize":12,"TextVerticalAlign":"center",
+     cikmayanHarfLbl := MYSecondForm.AddNewProLabel(cikmayanHarfPanel,'cikmayanHarfLbl','Harfler : ');
+   clComponent.SetupComponent(cikmayanHarfLbl,'{"Align" : "left","MarginBottom":10,"MarginLeft":20,"Width" :250, "Height":30,"TextColor":"#000000","TextSize":12,"TextVerticalAlign":"center",
    "TextHorizontalAlign":"left","TextBold":"yes"}');
    
 end;
 
-Procedure takeLetter
+Procedure harfAl
 begin
-    letterPanel:=MYSecondForm.AddNewProPanel(gameContentPnl,'letterPanel');
-    clComponent.SetupComponent(letterPanel,'{"Align" : "Top","Width" :100, "MarginLeft":140,"MarginRight":140,"MarginTop":10,
+    harfPanel:=MYSecondForm.AddNewProPanel(gameContentPnl,'harfPanel');
+    clComponent.SetupComponent(harfPanel,'{"Align" : "Top","Width" :100, "MarginLeft":140,"MarginRight":140,"MarginTop":10,
     "Height":50,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":2}');
     
     EditFixWidth := 25;
-    letterEdit:= MYSecondForm.AddNewEdit(letterPanel,'letterEdit','____');
-    MYSecondForm.AddNewEvent(letterEdit,tbeOnChange,'MyEditOnChange');
-    letterEdit.Width := EditFixWidth;
-    letterEdit.Align := alCenter;
-    letterEdit.MaxLength := 1;
+    harfEdit:= MYSecondForm.AddNewEdit(harfPanel,'harfEdit','____');
+    MYSecondForm.AddNewEvent(harfEdit,tbeOnChange,'MyEditOnChange');
+    harfEdit.Width := EditFixWidth;
+    harfEdit.Align := alCenter;
+    //MyEdit1.CharCase := 1;//UpperCase;
+    harfEdit.MaxLength := 1;
 
 end;
 
   Procedure SetupStartBtn;
   begin
-    ztLayout := MYSecondForm.AddNewLayout(gamePanel,'ztLayout');
+    ztLayout := MYSecondForm.AddNewLayout(oyunPanel,'ztLayout');
     ztLayout.Align:=alBottom;
     ztLayout.Height := 130;
     ztLayout.Margins.Top := 5;
@@ -237,6 +245,9 @@ end;
     LblDisplay.Visible := True;
   end;
 
+
+{--------------------   HİNT Btn oldugu yer  -------------------------------------------}
+
   procedure SetupHintBtn;
   begin
     ztHintBtnLayout := MYSecondForm.AddNewLayout(hintContentPnl,'ztHintBtnLayout');
@@ -263,11 +274,13 @@ end;
     
   end;
   
+  
+   {----------------------------- Memo ----------------------------------------------}
   Procedure SetupWordMean;
   var
    ztProPanel : TclProPanel;
    begin
-    ztProPanel:=MYSecondForm.AddNewProPanel(gamePanel,'ztProPanel');
+    ztProPanel:=MYSecondForm.AddNewProPanel(oyunPanel,'ztProPanel');
     clComponent.SetupComponent(ztProPanel,'{"Align" : "MostTop","Width" :80, "MarginTop":10,"MarginRight":10,"MarginLeft":10, 
     "Height":100,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":2}');
     
@@ -281,18 +294,20 @@ end;
   Procedure gameContent;
   begin
   
-  gameContentPnl:=MyForm.AddNewProPanel(gamePanel,'gameContentPnl');
+  gameContentPnl:=MyForm.AddNewProPanel(oyunPanel,'gameContentPnl');
   clComponent.SetupComponent(gameContentPnl,'{"Align" : "Top","MarginTop":10, "MarginLeft":5,"MarginRight":5,
   "Height":400}');
   
+  //ALT KISMINA RESİM VE İPUCU BİLGİLERİ
   imageHintContentPnl:=MyForm.AddNewProPanel(gameContentPnl,'imageHintContentPnl');
   clComponent.SetupComponent(imageHintContentPnl,'{"Align" : "Bottom","MarginTop":10,"MarginLeft":5,"MarginRight":5,
   "Height":250}');
 
-    manImg := MYSecondForm.AddNewProImage(imageHintContentPnl,'manImg');
-    clComponent.SetupComponent(manImg,'{"Align" : "Right","RoundHeight":10,"RoundWidth":10,"MarginTop":5,"MarginBottom":5,
+    adamImg := MYSecondForm.AddNewProImage(imageHintContentPnl,'adamImg');
+    clComponent.SetupComponent(adamImg,'{"Align" : "Right","RoundHeight":10,"RoundWidth":10,"MarginTop":5,"MarginBottom":5,
     "BorderColor":"#000000","BorderWidth":0,"ImgUrl":"https://clomosy.com/educa/hangerTitle2.png","ImgFit":"yes"}');
- 
+    
+    //HİNT VE HİNT BUTON ALANI
     hintContentPnl:=MyForm.AddNewProPanel(imageHintContentPnl,'hintContentPnl');
     clComponent.SetupComponent(hintContentPnl,'{"Align" : "Left","MarginTop":10,"MarginLeft":5,"Width":130}');
     
@@ -300,15 +315,15 @@ end;
   
   end;
   
-  Procedure ScreenTwo;
+  Procedure ekraniki;
   begin
     MYSecondForm := TCLForm.Create(Self);
     MYSecondForm.SetFormColor('#6af2e4','#CBEDD5',clGVertical);
     
     
-    strvalue:=5;
-    gamePanel:=MYSecondForm.AddNewProPanel(MYSecondForm,'gamePanel');
-    clComponent.SetupComponent(gamePanel,'{"Align" : "Client","MarginRight":10,"MarginLeft":10,
+    strdeger:=5;
+    oyunPanel:=MYSecondForm.AddNewProPanel(MYSecondForm,'oyunPanel');
+    clComponent.SetupComponent(oyunPanel,'{"Align" : "Client","MarginRight":10,"MarginLeft":10,
     "MarginBottom":10,"MarginTop":10,"RoundHeight":10,"RoundWidth":10,
     "BorderColor":"#000000","BorderWidth":2}');
     
@@ -318,7 +333,7 @@ end;
     
     SetupLayout;
     SetupStartBtn;
-    takeLetter;
+    harfAl;
     cikmayanHarf;
     
     MYSecondForm.Run;
@@ -330,30 +345,33 @@ procedure BtnOnClick;
 var
   valueStr : String;
 begin
-  if chooseCombo.ItemIndex <> 0 then 
-    ScreenTwo;
+  if secimCombo.ItemIndex <> 0 then 
+    ekraniki;
   else
-    ShowMessage('Make Your Choice');
+    ShowMessage('Seçim Yapınız');
     
 end;
+
+
+
 begin
 
   MyForm := TCLForm.Create(Self);
   MyForm.SetFormColor('#6af2e4','#CBEDD5',clGVertical);
 
- screenPanel:=MyForm.AddNewProPanel(MyForm,'screenPanel');
- clComponent.SetupComponent(screenPanel,'{"Align" : "Client","Width" :300, "MarginTop":15,"MarginRight":15,"MarginLeft":15,"MarginBottom":15,
+ ekranPanel:=MyForm.AddNewProPanel(MyForm,'ekranPanel');
+ clComponent.SetupComponent(ekranPanel,'{"Align" : "Client","Width" :300, "MarginTop":15,"MarginRight":15,"MarginLeft":15,"MarginBottom":15,
  "Height":600,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":2}');
 
 
- titlekImg := MyForm.AddNewProImage(screenPanel,'titlekImg');
- clComponent.SetupComponent(titlekImg,'{"Align" : "Top","MarginTop":45,"MarginRight":15,"MarginLeft":15,"Width" :150, "Height":150,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#fabd2","BorderWidth":0,
+ baslikImg := MyForm.AddNewProImage(ekranPanel,'baslikImg');
+ clComponent.SetupComponent(baslikImg,'{"Align" : "Top","MarginTop":45,"MarginRight":15,"MarginLeft":15,"Width" :150, "Height":150,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#fabd2","BorderWidth":0,
  "ImgUrl":"https://clomosy.com/educa/hangerTitle.png", "ImgFit":"yes"}');
 
 
 
- chooseLbl := MyForm.AddNewProLabel(screenPanel,'chooseLbl','Select Word Length');
- clComponent.SetupComponent(chooseLbl,'{"Align" : "Center",
+ secimLbl := MyForm.AddNewProLabel(ekranPanel,'secimLbl','Kelime Uzunlugu Seçin ');
+ clComponent.SetupComponent(secimLbl,'{"Align" : "Center",
  "MarginBottom":100,
  "Width" :150,
  "Height":30,
@@ -364,24 +382,24 @@ begin
  "TextBold":"yes"}');
 
 
-  chooseCombo := MyForm.AddNewComboBox(screenPanel,'chooseCombo');
-  chooseCombo.Align := alCenter;
-  chooseCombo.Width := 150;
-  chooseCombo.Margins.Bottom:=20;
+  secimCombo := MyForm.AddNewComboBox(ekranPanel,'secimCombo');
+  secimCombo.Align := alCenter;
+  secimCombo.Width := 150;
+  secimCombo.Margins.Bottom:=20;
   
-  chooseCombo.AddItem('Make Your Choose','0')
+  secimCombo.AddItem('Seçiminizi Yapın','0')
   
-  for loopCombo := 2 to 10 do 
+  for donguCombo := 2 to 10 do 
   begin
-   chooseCombo.AddItem(IntToStr(loopCombo),IntToStr(loopCombo));
+   secimCombo.AddItem(IntToStr(donguCombo),IntToStr(donguCombo));
   end;
 
-   startBtn := MyForm.AddNewProButton(screenPanel,'startBtn','');
-   clComponent.SetupComponent(startBtn,'{"caption":"","Align" : "Bottom","MarginBottom":40,"Width" :100, 
+   baslaBtn := MyForm.AddNewProButton(ekranPanel,'baslaBtn','');
+   clComponent.SetupComponent(baslaBtn,'{"caption":"","Align" : "Bottom","MarginBottom":40,"Width" :100, 
    "Height":70,"RoundHeight":2,
    "RoundWidth":2,"BorderColor":"#000000","BorderWidth":2}');
-   MyForm.SetImage(startBtn,'https://clomosy.com/educa/hanger.png'); 
-   MyForm.AddNewEvent(startBtn,tbeOnClick,'BtnOnClick');
+   MyForm.SetImage(baslaBtn,'https://clomosy.com/educa/hanger.png'); 
+   MyForm.AddNewEvent(baslaBtn,tbeOnClick,'BtnOnClick');
 
 MyForm.Run;
 end;
