@@ -16,10 +16,10 @@ var
   ztHintBtn,ztStartBtn:TclImage;
   ztLayout,ztHintBtnLayout:TclLayout;
   AnswStr,Kelime:String;
-  wrongCount:integer;
+  wrongCount,chance : integer;
   
 
-//{ --------------------- Yeni Kelime Alma Prosedürü --------------------- }
+// --------------------- Yeni Kelime Alma Prosedürü --------------------- 
   void GetNewWord(wordLength:Integer);
   {
     myGameEngine= TclGameEngine.Create;
@@ -34,7 +34,7 @@ var
     }
   }
   
-   //{--------------- kelime kontrol --------------------}
+   //--------------- kelime kontrol --------------------
   void kelimeKontrol;
   var
     j:integer;
@@ -52,7 +52,7 @@ var
   }
   
   
-  //{---------------------kelime bilinip bilinmediğini kontrol------------------------------}
+  //---------------------kelime bilinip bilinmediğini kontrol------------------------------
   void CheckGameOnClick;
   {
     kelime = '';
@@ -71,7 +71,6 @@ var
     }
     else
     {
-      //
     }
   }
 
@@ -85,6 +84,7 @@ var
         //MYSecondForm.setImage(ztStartBtn,'https://img.icons8.com/carbon-copy/100/null/checked--v1.png');
         //ztStartLbl.Text = 'Check Word';
         ztStartBtn.Tag = 1; //buton içerisinde veri saklama işlemi yapılabilir. 
+        harfEdit.ReadOnly=False;
         wrongCount = 0;
         GetNewWord(StrToInt(secimCombo.ItemIndex)+1);
         MyWordMean.Text = WordMean;
@@ -109,6 +109,9 @@ var
     harfState=False;
     source = MyWord;
 
+    if(harfEdit.Text <> '')
+    {
+
     for (dongu = 1 to secimCombo.ItemIndex+1 )
     {
       karakter = Copy(source, dongu, 1);
@@ -119,9 +122,10 @@ var
         CheckGameOnClick;
       }
     }
-   
+    
     if (not harfState )
     {
+      
       wrongCount = wrongCount +1;
       cikmayanHarfLbl.Text=cikmayanHarfLbl.Text+ harfEdit.Text + ' , ';
       if (wrongCount == 11 )
@@ -130,10 +134,11 @@ var
         MYSecondForm.setImage(ztStartBtn,'https://clomosy.com/educa/checked2.png');
         ztStartLbl.Text = 'Check Word';
         ztStartBtn.Tag = 1;
+        harfEdit.ReadOnly=False;
         wrongCount = 1;
         GetNewWord(StrToInt(secimCombo.ItemIndex));
         MyWordMean.Text = WordMean;
-        MyEdit.Text='';
+        //MyEdit.Text='';
         
         MyEdit.SetFocus;
         LblDisplay.Visible = False;
@@ -159,7 +164,8 @@ var
       11:clComponent.SetupComponent(adamImg,'{"Align" : "Center","MarginLeft":5,"MarginRight":5,"MarginTop":50,"Width" :150, "Height":250,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":0,"ImgUrl":"https://clomosy.com/educa/hangman11.png", "ImgFit":"yes"}');
       }
     }
- 
+    }
+    harfEdit.Text='';
   }
   
   //{---------------KELİME UZUNLUĞU------------------}
@@ -178,7 +184,6 @@ var
     {
       EditFixWidth = 25;
       MyEdit = MYSecondForm.AddNewEdit(MyPanel,'MyEdit'+IntToStr(counter),'_');
-      //MYSecondForm.AddNewEvent(MyEdit,tbeOnChange,'MyEditOnChange');
       MyEdit.Width = EditFixWidth;
       MyEdit.Align = alLeft;
       MyEdit.ReadOnly = True;
@@ -214,6 +219,7 @@ void harfAl
     harfEdit.Align = alCenter;
     //MyEdit1.CharCase = 1;//UpperCase;
     harfEdit.MaxLength = 1;
+    harfEdit.ReadOnly = true;
 
 }
 
@@ -243,8 +249,31 @@ void harfAl
     
   }
   void ztHintBtnOnClick;
+      var
+    hintValue,usedLetter : String;
+    firstLetter,secondLetter : String;
+    rasgeleSayi,wordLength,firstIndex,i : Integer;
   {
-    LblDisplay.Visible = True;
+          if(ztStartBtn.Tag==1)
+          {
+            wordLength=IntToStr(Length(MyWord))
+            LblDisplay.Visible = True;
+            firstIndex = clMath.GenerateRandom(1,StrToInt(wordLength));
+            // HARFLER ALINDI
+            firstLetter = Copy(MyWord,firstIndex,1);
+            
+            
+            if(LblDisplay.Text == firstLetter)
+            {
+            ztHintBtnOnClick;
+            }
+            else
+            {
+              usedLetter = usedLetter+firstLetter;
+              LblDisplay.Text = AnsiUpperCase(firstLetter);
+            }
+          }
+          
   }
 
 
@@ -360,7 +389,9 @@ var
 
   MyForm = TCLForm.Create(Self);
   MyForm.SetFormColor('#6af2e4','#CBEDD5',clGVertical);
-
+  
+  chance = 0;
+  
  ekranPanel=MyForm.AddNewProPanel(MyForm,'ekranPanel');
  clComponent.SetupComponent(ekranPanel,'{"Align" : "Client","Width" :300, "MarginTop":15,"MarginRight":15,"MarginLeft":15,"MarginBottom":15,
  "Height":600,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":2}');

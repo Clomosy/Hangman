@@ -16,10 +16,10 @@ var
   ztHintBtn,ztStartBtn:TclImage;
   ztLayout,ztHintBtnLayout:TclLayout;
   AnswStr,Kelime:String;
-  wrongCount:integer;
+  wrongCount,chance :integer;
   
 
-{ --------------------- Yeni Kelime Alma Prosedürü --------------------- }
+// --------------------- Yeni Kelime Alma Prosedürü --------------------- 
   Procedure GetNewWord(wordLength:Integer);
   begin
     myGameEngine:= TclGameEngine.Create;
@@ -34,7 +34,7 @@ var
     End;
   End;
   
-   {--------------- kelime kontrol --------------------}
+ // --------------- kelime kontrol --------------------
   Procedure kelimeKontrol;
   var
     j:integer;
@@ -52,7 +52,7 @@ var
   End;
   
   
-  {---------------------kelime bilinip bilinmediğini kontrol------------------------------}
+  //---------------------kelime bilinip bilinmediğini kontrol------------------------------
   Procedure CheckGameOnClick;
   begin
     kelime := '';
@@ -84,6 +84,7 @@ var
         //MYSecondForm.setImage(ztStartBtn,'https://img.icons8.com/carbon-copy/100/null/checked--v1.png');
         //ztStartLbl.Text := 'Check Word';
         ztStartBtn.Tag := 1; //buton içerisinde veri saklama işlemi yapılabilir. 
+        harfEdit.ReadOnly := False;
         wrongCount := 0;
         GetNewWord(StrToInt(secimCombo.ItemIndex)+1);
         MyWordMean.Text := WordMean;
@@ -107,7 +108,8 @@ var
   begin
     harfState:=False;
     source := MyWord;
-
+if harfEdit.Text <> '' then
+begin
     for dongu := 1 to secimCombo.ItemIndex+1 do
     begin
       karakter := Copy(source, dongu, 1);
@@ -129,10 +131,11 @@ var
         MYSecondForm.setImage(ztStartBtn,'https://clomosy.com/educa/checked2.png');
         ztStartLbl.Text := 'Check Word';
         ztStartBtn.Tag := 1;
+        harfEdit.ReadOnly := False;
         wrongCount := 1;
         GetNewWord(StrToInt(secimCombo.ItemIndex));
         MyWordMean.Text := WordMean;
-        MyEdit.Text:='';
+        //MyEdit.Text:='';
         
         MyEdit.SetFocus;
         LblDisplay.Visible := False;
@@ -157,10 +160,11 @@ var
       11:clComponent.SetupComponent(adamImg,'{"Align" : "Center","MarginLeft":5,"MarginRight":5,"MarginTop":50,"Width" :150, "Height":250,"RoundHeight":10,"RoundWidth":10,"BorderColor":"#000000","BorderWidth":0,"ImgUrl":"https://clomosy.com/educa/hangman11.png", "ImgFit":"yes"}');
       end;
     end;
- 
+ end;
+ harfEdit.Text := '';
   end;
   
-  {---------------KELİME UZUNLUĞU------------------}
+  //---------------KELİME UZUNLUĞU------------------
   Procedure SetupLayout;
   begin
 
@@ -240,13 +244,35 @@ end;
     ztStartLbl.Width := 150;
     
   end;
-  Procedure ztHintBtnOnClick;
+  procedure ztHintBtnOnClick;
+      var
+    hintValue,usedLetter : String;
+    firstLetter,secondLetter : String;
+    rasgeleSayi,wordLength,firstIndex,i : Integer;
   begin
-    LblDisplay.Visible := True;
+          if ztStartBtn.Tag = 1 then
+          begin
+            wordLength := IntToStr(Length(MyWord))
+            LblDisplay.Visible := True;
+            firstIndex := clMath.GenerateRandom(1,StrToInt(wordLength));
+            // HARFLER ALINDI
+            firstLetter := Copy(MyWord,firstIndex,1);
+            
+            
+            if LblDisplay.Text = firstLetter then 
+            begin
+            ztHintBtnOnClick;
+            end;
+            else
+            begin
+              usedLetter := usedLetter+firstLetter;
+              LblDisplay.Text := AnsiUpperCase(firstLetter);
+            end;
+          end;
   end;
 
 
-{--------------------   HİNT Btn oldugu yer  -------------------------------------------}
+//--------------------   HİNT Btn oldugu yer  -------------------------------------------
 
   procedure SetupHintBtn;
   begin
@@ -275,7 +301,7 @@ end;
   end;
   
   
-   {----------------------------- Memo ----------------------------------------------}
+   //----------------------------- Memo ----------------------------------------------
   Procedure SetupWordMean;
   var
    ztProPanel : TclProPanel;
@@ -358,6 +384,8 @@ begin
 
   MyForm := TCLForm.Create(Self);
   MyForm.SetFormColor('#6af2e4','#CBEDD5',clGVertical);
+  
+  chance := 0;
 
  ekranPanel:=MyForm.AddNewProPanel(MyForm,'ekranPanel');
  clComponent.SetupComponent(ekranPanel,'{"Align" : "Client","Width" :300, "MarginTop":15,"MarginRight":15,"MarginLeft":15,"MarginBottom":15,
