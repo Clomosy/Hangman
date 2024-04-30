@@ -2,13 +2,13 @@ var
   MyForm, MYSecondForm:TCLForm;
   baslaBtn : TclProButton;
   baslikImg,adamImg: TClProImage; 
-  secimLbl,cikmayanHarfLbl  : TClProLabel;
+  LblDisplay,secimLbl,cikmayanHarfLbl  : TClProLabel;
   secimCombo : TClComboBox;
   donguCombo ,dongu, source,counter : Integer;
   oyunPanel,harfPanel,cikmayanHarfPanel,ekranPanel,gameContentPnl,imageHintContentPnl,hintContentPnl : TclProPanel;
   strdeger, MyWord, WordMean,karakter:String;
   MyWordMean:TclMemo;
-  LblDisplay,ztStartLbl:TclLabel;
+  ztStartLbl:TclLabel;
   myGameEngine:TclGameEngine;
   MyPanel:TclPanel;
   harfEdit,MyEdit:TclEdit;
@@ -294,15 +294,8 @@ void harfAl
     MYSecondForm.setImage(ztHintBtn,'https://clomosy.com/educa/hint1.png');
     MYSecondForm.AddNewEvent(ztHintBtn,tbeOnClick,'ztHintBtnOnClick');
     
-    LblDisplay= MYSecondForm.AddNewLabel(ztHintBtnLayout,'LblDisplay',' ');
-    LblDisplay.Align = alTop;
-    LblDisplay.Margins.Left =5;
-    LblDisplay.Margins.Right= 5;
-    LblDisplay.Margins.Top=5;
-    LblDisplay.Height = 30;
-    LblDisplay.TextSettings.Font.Size=3;
-    LblDisplay.Visible = True;
-    
+    LblDisplay= MYSecondForm.AddNewProLabel(ztHintBtnLayout,'LblDisplay',' ');
+    clComponent.SetupComponent(LblDisplay,'{"Align" : "Top","MarginLeft":5,"MarginRight":5,"MarginTop":5,"Height":30,"TextColor":"#000000"}');
   }
   
   
