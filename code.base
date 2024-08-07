@@ -168,7 +168,7 @@ begin
   Procedure SetupLayout;
   begin
 
-    MyPanel:= MYSecondForm.AddNewPanel(gameContentPnl,'MyPanel','');
+    MyPanel:= MYSecondForm.AddNewPanel(gameContentPnl,'MyPanel');
     MyPanel.Align := alCenter;
     MyPanel.Height := 25;
     MyPanel.Margins.Top:=5;
